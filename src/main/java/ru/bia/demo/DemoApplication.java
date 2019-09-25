@@ -7,6 +7,10 @@ import org.activiti.api.process.model.ProcessInstance;
 import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
 import org.activiti.api.process.runtime.ProcessRuntime;
 import org.activiti.api.process.runtime.events.ProcessCompletedEvent;
+import org.activiti.api.process.runtime.events.ProcessCreatedEvent;
+import org.activiti.api.process.runtime.events.ProcessStartedEvent;
+import org.activiti.api.process.runtime.events.ProcessUpdatedEvent;
+import org.activiti.api.process.runtime.events.listener.ProcessRuntimeEventListener;
 import org.activiti.api.runtime.shared.query.Page;
 import org.activiti.api.runtime.shared.query.Pageable;
 import org.activiti.api.task.model.Task;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.parameters.P;
 import ru.bia.process.model.Cargo;
 import ru.bia.process.model.Characteristic;
@@ -58,9 +63,8 @@ public class DemoApplication implements CommandLineRunner {
 		listAvailableProcesses();
 		ProcessInstance processInstance = startProcess();
 		listProcessVariables(processInstance);
-//		completeAvailableTasks();
+		completeAvailableTasks();
 		listAllCreatedVariables();
-		listCompletedProcesses();
 	}
 
 	private void listAvailableProcesses() {
@@ -73,20 +77,17 @@ public class DemoApplication implements CommandLineRunner {
 	}
 
 	private ProcessInstance startProcess() {
-		ProcessInstance processInstance = processRuntime.start(ProcessPayloadBuilder
-				.start()
-				.withProcessDefinitionKey("process-1d706ba2-b04a-49d8-a4b5-08f66c9a14a3")
-				.withName("FullProcess")
-				.withVariable("inOrder", getOrder())
+        return processRuntime.start(ProcessPayloadBuilder
+                .start()
+                .withProcessDefinitionKey("process-1d706ba2-b04a-49d8-a4b5-08f66c9a14a3")
+                .withName("FullProcess")
+                .withVariable("inOrder", getOrder())
                 .withBusinessKey("demo-test")
-				.build());
-		logger.info(">>> Created Process Instance: " + processInstance);
-		return processInstance;
+                .build());
 	}
 
 	private Order getOrder() {
 		Order order = new Order();
-		order.setId(UUID.randomUUID().toString());
 		Product product = new Product();
 		product.setIdSpec(UUID.randomUUID().toString());
 		Characteristic characteristic = new Characteristic();
@@ -150,4 +151,24 @@ public class DemoApplication implements CommandLineRunner {
 		processCompletedEvents.forEach(processCompletedEvent -> logger.info("\t> Process instance : " + processCompletedEvent.getEntity()));
 	}
 
+	@Bean
+	public ProcessRuntimeEventListener<ProcessCompletedEvent> processCompletedListener() {
+		return processEvent -> logger.info(">>> Process Completed: '"
+				+ processEvent.getEntity().getName() +
+				"' We can send a notification to the initiator: " + processEvent.getEntity().getInitiator());
+	}
+
+	@Bean
+    public ProcessRuntimeEventListener<ProcessUpdatedEvent> processUpdatedListener() {
+	    return processEvent -> listProcessVariables(processEvent.getEntity());
+    }
+
+    @Bean
+    public ProcessRuntimeEventListener<ProcessStartedEvent> processCreatedListiner() {
+	    return processEvent -> {
+	    	logger.info(">>> Created Process Instance: " + processEvent.getEntity());
+			securityUtil.logInAs("system");
+			listProcessVariables(processEvent.getEntity());
+		};
+    }
 }

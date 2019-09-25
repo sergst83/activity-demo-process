@@ -25,7 +25,7 @@
               </bpsim:UnitCost>
             </bpsim:CostParameters>
           </bpsim:ElementParameters>
-          <bpsim:ElementParameters elementRef="_B5D54C42-9FCB-4AE6-BFD5-4F8E07A8DBAB" id="_K1HZFNt9Eemqs50vUk9iXw">
+          <bpsim:ElementParameters elementRef="sendPutWhServiceTask_ID" id="_K1HZFNt9Eemqs50vUk9iXw">
             <bpsim:TimeParameters>
               <bpsim:ProcessingTime>
                 <bpsim:NormalDistribution mean="0.0" standardDeviation="0.0" />
@@ -73,7 +73,7 @@
         <extensionElements />
         <flowNodeRef>_1AC89E15-EC30-4CA7-9429-D67825BAC663</flowNodeRef>
         <flowNodeRef>_7476455D-6507-43DB-99EB-D55AF79CCD4E</flowNodeRef>
-        <flowNodeRef>_B5D54C42-9FCB-4AE6-BFD5-4F8E07A8DBAB</flowNodeRef>
+        <flowNodeRef>sendPutWhServiceTask_ID</flowNodeRef>
       </lane>
     </laneSet>
     <sequenceFlow id="_9B6CBF51-8340-4CCC-89D0-E46C85ECA7DD" name="Да" sourceRef="_7476455D-6507-43DB-99EB-D55AF79CCD4E" targetRef="_2DD5E2B2-2B60-4B52-B7E5-6F7B157EA2AA">
@@ -86,7 +86,7 @@
     </sequenceFlow>
     <sequenceFlow id="_2E7E2A27-9B14-4AA6-A5A1-ACDC7759DD1E" sourceRef="StartEvent_1" targetRef="sendPickUpServiceTask_ID" />
     <sequenceFlow id="_CE6EB3A8-627F-4958-8A4D-3226BD7A4AFC" sourceRef="_1AC89E15-EC30-4CA7-9429-D67825BAC663" targetRef="_7476455D-6507-43DB-99EB-D55AF79CCD4E" />
-    <sequenceFlow id="_B87CB3D9-FAF2-4E36-AA57-AA6DFE027C25" sourceRef="_B5D54C42-9FCB-4AE6-BFD5-4F8E07A8DBAB" targetRef="_1AC89E15-EC30-4CA7-9429-D67825BAC663">
+    <sequenceFlow id="_B87CB3D9-FAF2-4E36-AA57-AA6DFE027C25" sourceRef="sendPutWhServiceTask_ID" targetRef="_1AC89E15-EC30-4CA7-9429-D67825BAC663">
       <extensionElements />
     </sequenceFlow>
     <sequenceFlow id="_A124F056-2BBD-48B7-9B26-2DF81C510201" name="Нет" sourceRef="_7476455D-6507-43DB-99EB-D55AF79CCD4E" targetRef="_1AC89E15-EC30-4CA7-9429-D67825BAC663">
@@ -134,8 +134,8 @@
     </subProcess>
     <subProcess id="_1AC89E15-EC30-4CA7-9429-D67825BAC663" name="Проверка статуса прибытия груза на склад">
       <extensionElements />
-      <sequenceFlow id="SequenceFlow_3" sourceRef="_83FD2F72-0B18-41A5-8581-4F1212806C58" targetRef="_6E104CA8-F043-429D-80A7-1D436C0BD963" />
-      <sequenceFlow id="SequenceFlow_2" sourceRef="IntermediateCatchEvent_2" targetRef="_83FD2F72-0B18-41A5-8581-4F1212806C58" />
+      <sequenceFlow id="SequenceFlow_3" sourceRef="checkPutWhServiceTask_ID" targetRef="_6E104CA8-F043-429D-80A7-1D436C0BD963" />
+      <sequenceFlow id="SequenceFlow_2" sourceRef="IntermediateCatchEvent_2" targetRef="checkPutWhServiceTask_ID" />
       <sequenceFlow id="SequenceFlow_1" sourceRef="_AD1A7DB1-BB9C-49C9-8ABD-3C81E5813833" targetRef="IntermediateCatchEvent_2" />
       <endEvent id="_6E104CA8-F043-429D-80A7-1D436C0BD963" />
       <intermediateCatchEvent id="IntermediateCatchEvent_2" name="CheckWhPutTumeout">
@@ -145,7 +145,7 @@
         </timerEventDefinition>
       </intermediateCatchEvent>
       <startEvent id="_AD1A7DB1-BB9C-49C9-8ABD-3C81E5813833" />
-      <serviceTask id="_83FD2F72-0B18-41A5-8581-4F1212806C58" name="Проверка поступления груза на склад" implementation="putwh.checkPutWh">
+      <serviceTask id="checkPutWhServiceTask_ID" name="Проверка поступления груза на склад" implementation="putwh.checkPutWh">
         <incoming>SequenceFlow_2</incoming>
         <outgoing>SequenceFlow_3</outgoing>
       </serviceTask>
@@ -154,11 +154,11 @@
       <incoming>_2E7E2A27-9B14-4AA6-A5A1-ACDC7759DD1E</incoming>
       <outgoing>_8478F89F-CC9E-4503-94CD-07360C5DD8BF</outgoing>
     </serviceTask>
-    <serviceTask id="_B5D54C42-9FCB-4AE6-BFD5-4F8E07A8DBAB" name="Запрос на подготовку к приему груза на склад" implementation="putwh.sendPutWh">
+    <serviceTask id="sendPutWhServiceTask_ID" name="Запрос на подготовку к приему груза на склад" implementation="putwh.sendPutWh">
       <incoming>SequenceFlow_1wa74ni</incoming>
       <outgoing>_B87CB3D9-FAF2-4E36-AA57-AA6DFE027C25</outgoing>
     </serviceTask>
-    <sequenceFlow id="SequenceFlow_1wa74ni" name="Да" sourceRef="ExclusiveGateway_10" targetRef="_B5D54C42-9FCB-4AE6-BFD5-4F8E07A8DBAB">
+    <sequenceFlow id="SequenceFlow_1wa74ni" name="Да" sourceRef="ExclusiveGateway_10" targetRef="sendPutWhServiceTask_ID">
       <conditionExpression xsi:type="tFormalExpression">${pickUpStatus == 'succeeded'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="SequenceFlow_1f8tay9" name="Нет" sourceRef="ExclusiveGateway_10" targetRef="SubProcess_3">
@@ -293,10 +293,10 @@
       <bpmndi:BPMNShape id="ServiceTask_1vk4ojm_di" bpmnElement="checkPickUpServiceTask_ID">
         <omgdc:Bounds x="714" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_1tre0c7_di" bpmnElement="_B5D54C42-9FCB-4AE6-BFD5-4F8E07A8DBAB">
+      <bpmndi:BPMNShape id="ServiceTask_1tre0c7_di" bpmnElement="sendPutWhServiceTask_ID">
         <omgdc:Bounds x="1095" y="513" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_09zs4l3_di" bpmnElement="_83FD2F72-0B18-41A5-8581-4F1212806C58">
+      <bpmndi:BPMNShape id="ServiceTask_09zs4l3_di" bpmnElement="checkPutWhServiceTask_ID">
         <omgdc:Bounds x="543" y="509" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1wa74ni_di" bpmnElement="SequenceFlow_1wa74ni">

@@ -1,20 +1,20 @@
 package ru.bia.demo;
 
-import org.activiti.api.model.shared.model.VariableInstance;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.activiti.api.process.model.IntegrationContext;
-import org.activiti.api.process.model.ProcessInstance;
-import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
-import org.activiti.api.process.runtime.ProcessRuntime;
 import org.activiti.api.process.runtime.connector.Connector;
-import org.activiti.api.runtime.shared.query.Pageable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.bia.demo.client.RestClient;
+import ru.bia.process.model.Order;
 
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -22,18 +22,41 @@ public class Services {
     private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @Autowired
-    private ProcessRuntime processRuntime;
+    private RestClient restClient;
 
     @Autowired
-    private SecurityUtil securityUtil;
+    protected ObjectMapper objectMapper;
 
     @Bean(name = "pickup.sendPickUp")
     Connector sendPickUp() {
         return integrationContext -> {
-            integrationContext.addOutBoundVariable("status", "running");
-            integrationContext.addOutBoundVariable("numberPlate", "12345");
-            integrationContext.addOutBoundVariable("order", integrationContext.getInBoundVariables().get("order"));
-            integrationContext.addOutBoundVariable("arriveAt", new Date());
+            try {
+                Map<String, Object> response = restClient.createPickUpOperation(integrationContext.getInBoundVariables());
+
+                String status = (String) response.get("status" );
+                String orderId = (String) response.get("id" );
+                String numberPlate = (String) response.get("numberPlate");
+                MutableObject<Date> arriveAt = new MutableObject<>();
+                String a = (String) response.get("arriveAt");
+                if (a != null) {
+                    arriveAt.setValue(new StdDateFormat().parse(a));
+                }
+
+                Order order = (Order) integrationContext.getInBoundVariables().get("order");
+                order.setId(orderId);
+
+                Map<String, Object> result = new HashMap<>() {{
+                    put("status", status);
+                    put("order", order);
+                    put("numberPlate", numberPlate);
+                    put("arriveAt", arriveAt.getValue());
+                }};
+
+                integrationContext.addOutBoundVariables(result);
+            } catch (Exception  e) {
+                logger.error("sendPickUp ", e);
+            }
+
             logVariables(integrationContext);
             return integrationContext;
         };
@@ -42,11 +65,35 @@ public class Services {
     @Bean(name = "pickup.checkPickUp")
     Connector checkPickUp() {
         return integrationContext -> {
-            integrationContext.addOutBoundVariable("status", Math.random() < 0.5 ? "succeeded" : "running");
-            integrationContext.addOutBoundVariable("numberPlate", "12345");
-            integrationContext.addOutBoundVariable("order", integrationContext.getInBoundVariables().get("order"));
-            integrationContext.addOutBoundVariable("arriveAt", new Date());
-            integrationContext.addOutBoundVariable("pickUpAt", new Date());
+            try {
+                Map<String, Object> response = restClient.checkPickUpOperation(integrationContext.getInBoundVariables());
+                String status = (String) response.get("status" );
+                String numberPlate = (String) response.get("numberPlate");
+                MutableObject<Date> arriveAt = new MutableObject<>();
+                MutableObject<Date> pickUpAt = new MutableObject<>();
+                String a = (String) response.get("arriveAt");
+                if (a != null) {
+                    arriveAt.setValue(new StdDateFormat().parse(a));
+                }
+
+                String ss = (String) response.get("pickUpAt");
+                if (ss != null) {
+                    pickUpAt.setValue(new StdDateFormat().parse(ss));
+                }
+
+                Map<String, Object> result = new HashMap<>() {{
+                    put("status", status);
+                    put("arriveAt", arriveAt.getValue());
+                    put("numberPlate", numberPlate);
+                    put("pickUpAt", pickUpAt.getValue());
+                    put("order", integrationContext.getInBoundVariables().get("order"));
+                }};
+
+                integrationContext.addOutBoundVariables(result);
+            } catch (Exception e) {
+                logger.error("checkPickUp ", e);
+            }
+
             logVariables(integrationContext);
             return integrationContext;
         };
@@ -54,12 +101,48 @@ public class Services {
 
     @Bean(name = "putwh.sendPutWh")
     Connector sendPutWh() {
-        return getLogConnector();
+        return integrationContext -> {
+            try {
+                Map<String, Object> response = restClient.createPutWhOperation(integrationContext.getInBoundVariables());
+                String status = (String) response.get("putWhStatus");
+
+                Map<String, Object> result = new HashMap<>() {{
+                    put("status", status);
+                }};
+
+                integrationContext.addOutBoundVariables(result);
+            } catch (Exception e) {
+                logger.error("sendPutWh ", e);
+            }
+            logVariables(integrationContext);
+            return integrationContext;
+        };
     }
 
     @Bean(name = "putwh.checkPutWh")
     Connector checkPutWh() {
-        return getLogConnector();
+        return integrationContext -> {
+            try {
+                Map<String, Object> response = restClient.checkPutWhOperation(integrationContext.getInBoundVariables());
+                String status = (String) response.get("putWhStatus");
+                MutableObject<Date> puttedAt = new MutableObject<>();
+                String a = (String) response.get("puttedAt");
+                if (a != null) {
+                    puttedAt.setValue(new StdDateFormat().parse(a));
+                }
+
+                Map<String, Object> result = new HashMap<>() {{
+                    put("status", status);
+                    put("puttedAt", puttedAt.getValue());
+                }};
+
+                integrationContext.addOutBoundVariables(result);
+            } catch (Exception e) {
+                logger.error("sendPutWh ", e);
+            }
+            logVariables(integrationContext);
+            return integrationContext;
+        };
     }
 
     private Connector getLogConnector() {
@@ -76,25 +159,6 @@ public class Services {
         logger.info(">>Connector name: {}", integrationContext.getClientName());
         logger.info(">>inbound: " + inBoundVariables);
         logger.info(">>outbound: " + outBoundVariables);
-
-        try {
-            securityUtil.logInAs("system");
-            ProcessInstance processInstance = processRuntime.processInstance(integrationContext.getProcessInstanceId());
-            listProcessVariables(processInstance);
-        } catch (Exception e) {
-            logger.error("PeocessInstace log error ", e);
-        }
         logger.info("==================================");
-    }
-
-    private void listProcessVariables(ProcessInstance processInstance) {
-        logger.info(">>> Process instanceId:{}, name:{}", processInstance.getId(), processInstance.getName() );
-        logger.info(">>> Process variables:");
-        List<VariableInstance> variables = processRuntime.variables(
-                ProcessPayloadBuilder
-                        .variables()
-                        .withProcessInstance(processInstance)
-                        .build());
-        variables.forEach(variableInstance -> logger.info("\t> " + variableInstance.getName() + " -> " + variableInstance.getValue()));
     }
 }

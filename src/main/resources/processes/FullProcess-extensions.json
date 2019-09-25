@@ -118,6 +118,54 @@
             "value": "order"
           }
         }
+      },
+      "sendPutWhServiceTask_ID": {
+        "inputs": {
+          "order": {
+            "type": "variable",
+            "value": "inOrder"
+          },
+          "url": {
+            "type": "variable",
+            "value": "extServiceUrl"
+          },
+          "arriveAt": {
+            "type": "variable",
+            "value": "arriveAtPlan"
+          }
+        },
+        "outputs": {
+          "putWhStatus": {
+            "type": "variable",
+            "value": "status"
+          }
+        }
+      },
+      "checkPutWhServiceTask_ID": {
+        "inputs": {
+          "order": {
+            "type": "variable",
+            "value": "inOrder"
+          },
+          "url": {
+            "type": "variable",
+            "value": "extServiceUrl"
+          },
+          "numberPlate": {
+            "type": "variable",
+            "value": "pickUpNumPlate"
+          }
+        },
+        "outputs": {
+          "putWhStatus": {
+            "type": "variable",
+            "value": "status"
+          },
+          "arriveAtFact": {
+            "type": "variable",
+            "value": "puttedAt"
+          }
+        }
       }
     },
     "constants": {}

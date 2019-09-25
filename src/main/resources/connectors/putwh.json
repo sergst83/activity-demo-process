@@ -6,14 +6,63 @@
     "sendPutWh": {
       "id": "sendPutWh-Id",
       "name": "sendPutWh",
-      "inputs": [],
-      "outputs": []
+      "inputs": [
+        {
+          "id": "order-Id",
+          "name": "order",
+          "type": "object"
+        },
+        {
+          "id": "url-Id",
+          "name": "url",
+          "type": "string"
+        },
+        {
+          "id":"arriveAt-Id",
+          "name": "arriveAt",
+          "type": "date"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "status-Id",
+          "name": "status",
+          "type": "string"
+        }
+      ]
     },
     "checkPutWh": {
       "id": "checkPutWh-Id",
       "name": "checkPutWh",
-      "inputs": [],
-      "outputs": []
+      "inputs": [
+        {
+          "id": "order-Id",
+          "name": "order",
+          "type": "object"
+        },
+        {
+          "id": "url-Id",
+          "name": "url",
+          "type": "string"
+        },
+        {
+          "id": "numberPlate-Id",
+          "name": "numberPlate",
+          "type": "string"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "status-Id",
+          "name": "status",
+          "type": "string"
+        },
+        {
+          "id": "puttedAt-Id",
+          "name": "puttedAt",
+          "type": "string"
+        }
+      ]
     }
   }
 }
