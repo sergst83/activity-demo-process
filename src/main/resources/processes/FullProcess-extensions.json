@@ -1,0 +1,125 @@
+{
+  "id":"process-1d706ba2-b04a-49d8-a4b5-08f66c9a14a3",
+  "name": "FullProcess.bpmn20.xml",
+  "extensions": {
+    "properties": {
+      "inOrder-Id": {
+        "id": "inOrder-Id",
+        "name": "inOrder",
+        "type": "object",
+        "required": true
+      },
+      "pickUpStatus-Id": {
+        "id": "pickUpStatus-Id",
+        "name": "pickUpStatus",
+        "type": "string",
+        "value": "",
+        "required": false
+      },
+      "pickUpTime-Id": {
+        "id": "pickUpTime-Id",
+        "name": "pickUpTime",
+        "type": "date",
+        "required": false
+      },
+      "putWhStatus-Id": {
+        "id": "putWhStatus-Id",
+        "name": "putWhStatus",
+        "type": "string",
+        "required": false
+      },
+      "pickUpNumPlate-Id": {
+        "id": "pickUpNumPlate-Id",
+        "name": "pickUpNumPlate",
+        "type": "string",
+        "required": false
+      },
+      "arriveAtPlan-Id": {
+        "id": "arriveAtPlan-Id",
+        "name": "arriveAtPlan",
+        "type": "date",
+        "required": false
+      },
+      "arriveAtFact-Id": {
+        "id": "arriveAtFact-Id",
+        "name": "arriveAtFact",
+        "type": "date",
+        "required": false
+      },
+      "extServiceUrl-Id": {
+        "id": "extServiceUrl-Id",
+        "name": "extServiceUrl",
+        "type": "string",
+        "value": "http://localhost:8082/services/operations",
+        "required": true
+      }
+    },
+    "mappings": {
+      "sendPickUpServiceTask_ID": {
+        "inputs": {
+          "order": {
+            "type": "variable",
+            "value": "inOrder"
+          },
+          "url": {
+            "type": "variable",
+            "value": "extServiceUrl"
+          }
+        },
+        "outputs": {
+          "pickUpStatus": {
+            "type": "variable",
+            "value": "status"
+          },
+          "inOrder": {
+            "type": "variable",
+            "value": "order"
+          },
+          "arriveAtPlan": {
+            "type": "variable",
+            "value": "arriveAt"
+          },
+          "pickUpNumPlate": {
+            "type": "variable",
+            "value": "numberPlate"
+          }
+        }
+      },
+      "checkPickUpServiceTask_ID": {
+        "inputs": {
+          "order": {
+            "type": "variable",
+            "value": "inOrder"
+          },
+          "url": {
+            "type": "variable",
+            "value": "extServiceUrl"
+          }
+        },
+        "outputs": {
+          "pickUpStatus": {
+            "type": "variable",
+            "value": "status"
+          },
+          "pickUpNumPlate": {
+            "type": "variable",
+            "value": "numberPlate"
+          },
+          "arriveAtPlan": {
+            "type": "variable",
+            "value": "arriveAt"
+          },
+          "pickUpTime": {
+            "type": "variable",
+            "value": "pickUpAt"
+          },
+          "inOrder": {
+            "type": "variable",
+            "value": "order"
+          }
+        }
+      }
+    },
+    "constants": {}
+  }
+}

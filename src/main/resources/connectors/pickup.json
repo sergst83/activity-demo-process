@@ -1,0 +1,88 @@
+{
+  "id": "pickup-id",
+  "name": "pickup",
+  "description": "Забор груза, проверка статуса забора груза",
+  "actions": {
+    "sendPickUp": {
+      "id": "sendPickUp-Id",
+      "name": "sendPickUp",
+      "inputs": [
+        {
+          "id": "order-Id",
+          "name": "order",
+          "type": "object"
+        },
+        {
+          "id": "url-Id",
+          "name": "url",
+          "type": "string"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "status-Id",
+          "name": "status",
+          "type": "string"
+        },
+        {
+          "id": "numberPlate-Id",
+          "name": "numberPlate",
+          "type": "string"
+        },
+        {
+          "id":"arriveAt-Id",
+          "name": "arriveAt",
+          "type": "date"
+        },
+        {
+          "id": "order-Id",
+          "name": "order",
+          "type": "object"
+        }
+      ]
+    },
+    "checkPickUp": {
+      "id": "checkPickUp-Id",
+      "name": "checkPickUp",
+      "inputs": [
+        {
+          "id": "order-Id",
+          "name": "order",
+          "type": "object"
+        },
+        {
+          "id": "url-Id",
+          "name": "url",
+          "type": "string"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "status-Id",
+          "name": "status",
+          "type": "string"
+        },
+        {
+          "id": "numberPlate-Id",
+          "name": "numberPlate",
+          "type": "string"
+        },
+        {
+          "id":"arriveAt-Id",
+          "name": "arriveAt",
+          "type": "date"
+        },
+        {
+          "id":"pickUpAt-Id",
+          "name": "pickUpAt",
+          "type": "date"
+        },
+        {
+          "id": "order-Id",
+          "name": "order",
+          "type": "object"
+        }
+      ]
+    }
+  }
+}

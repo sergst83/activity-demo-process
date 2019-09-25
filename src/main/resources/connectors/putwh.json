@@ -1,0 +1,19 @@
+{
+  "id": "putwh-id",
+  "name": "putwh",
+  "description": "Резервирование склада, проверка поступления на склад",
+  "actions": {
+    "sendPutWh": {
+      "id": "sendPutWh-Id",
+      "name": "sendPutWh",
+      "inputs": [],
+      "outputs": []
+    },
+    "checkPutWh": {
+      "id": "checkPutWh-Id",
+      "name": "checkPutWh",
+      "inputs": [],
+      "outputs": []
+    }
+  }
+}
